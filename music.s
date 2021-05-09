@@ -1,11 +1,14 @@
 * http://eightbitsoundandfury.ld8.org/programming.html
+* Nodified : duration is now 2 bytes long (instead of 1 byte)
 * Attention: the musical notes are shifted in the table of this article
 * C is a G, D is a A, and so on
+* For accurate tone, frequency must be decreased by 1
+* because of 16 bits duration (it takes more time)
 
-        put const.s
+        put const.s     ; rom routines and vars
 
         DO 0
-nonote  MAC
+nonote  MAC             ; tune for a silence
 * byte 1 : anything except 0
 * byte 2 & 3 : duration 
 * last byte : 00 (flag for no play)
@@ -15,8 +18,8 @@ nonote  MAC
 
         org $8000
 
-main    lda #<music
-        ldx #>music
+main    lda #<music2
+        ldx #>music2
         jsr donote
 end     rts
 
@@ -36,7 +39,7 @@ music   hex 60800001      ; C
         nonote
         hex 00
 
-music2  hex 60010401      ; C
+music2  hex 5F011001      ; C
         hex 00
 
 ****** MUSIC Routines
@@ -69,13 +72,13 @@ enddn   rts
 play    lda bell        ; clic
 loop1   dey             ; y loop : duration 
         bne suite1
-        lda dura
+        lda dura        ; dec 16 bits duration value
         bne nodec
         dec dura+1
 nodec   dec dura
         lda dura
-        ora dura+1
-        beq endplay     ; exit when duration=0
+        ora dura+1      ; test : dura = 0 ?
+        beq endplay     ; yes : exit
 suite1  dex             ; x loop : frequency
         bne loop1       ; clic when x = 0
         ldx freq        ; reload frequency
