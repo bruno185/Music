@@ -18,8 +18,8 @@ nonote  MAC             ; tune for a silence
 
         org $8000
 
-main    lda #<music2
-        ldx #>music2
+main    lda #<music
+        ldx #>music
         jsr donote
 end     rts
 
